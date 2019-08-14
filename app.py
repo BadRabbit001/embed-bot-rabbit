@@ -1,6 +1,6 @@
 # CONFIG
 # ---------
-token = "NjAxNzQ0MzgwODAxMzE4OTIy.XThpfQ.7e3LcoI_Yh-78jXB7H4L7SbIrrw" # This is what the bot uses to log into Discord.
+.
 prefix = "!" # This will be used at the start of commands.
 embed_role = "OWNER" # The role in your server used for embedding.
 game = "with embeds!" # This will display as the game on Discord.
