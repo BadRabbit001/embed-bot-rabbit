@@ -1,163 +1,101 @@
-# Work with Python xxx
-import discord
-from discord.ext import commands, tasks
-import os
-import asyncio
-import random
-from itertools import cycle
-from discord.utils import get
+# CONFIG
+# ---------
+token = "NjAxNzQ0MzgwODAxMzE4OTIy.XThpfQ.7e3LcoI_Yh-78jXB7H4L7SbIrrw" # This is what the bot uses to log into Discord.
+prefix = "!" # This will be used at the start of commands.
+embed_role = "OWNER" # The role in your server used for embedding.
+game = "with embeds!" # This will display as the game on Discord.
+# ----------
 
-client = commands.Bot(command_prefix='!')
-#client = discord.Client()
+from discord.ext import commands
+from discord.ext.commands import Bot
+import discord, chalk
 
-#create an arraylist containing phrases you want your bot to switch through.
-status = cycle(['www.rabbit001.cf', 'With BlackRabbit', 'with Generator', 'with accounts'])
+bot = commands.Bot(command_prefix=prefix)
+bot.remove_command("help")
 
-@client.command()
-async def lala(ctx):
-    check_role = get(ctx.message.guild.roles, name='Leader')
-    if check_role in ctx.author.roles:
-        await ctx.send("Yes, you are the leader.")
-
-    else:
-        await ctx.send("You can't use this")
-
-@client.command()
-async def clear(ctx, amount=5):
-    await ctx.channel.purge(limit=amount)
-
-@client.command()
-async def ban(ctx):
-    check_role = get(ctx.message.guild.roles, name='BAN-SQUAD')
-    if check_role in ctx.author.roles:
-        await ctx.send("https://gifimage.net/wp-content/uploads/2017/07/ban-hammer-gif-14.gif")
-    else:
-        await ctx.send("You can't use this")
-    
-@client.event
+@bot.event
 async def on_ready():
-    print("Bot Was Deployed Sucessfully !")
-    while True:
-        await client.change_presence(game=Game(name='with BadRabbit'))
-        await asyncio.sleep(3)
-        await client.change_presence(game=Game(name='with Generator'))
-        await asyncio.sleep(3)
-        await client.change_presence(game=Game(name='this Server', type = 3))
-        await asyncio.sleep(3)
-        await client.change_presence(game=Game(name='Viktor Sheen', type = 2))
-        await asyncio.sleep(3)
+    chalk.blue ("Ready when you are. ;)") 
+    chalk.blue ("Name: {}".format(bot.user.name))
+    chalk.blue ("ID: {}".format(bot.user.id))
+    await bot.change_presence(game=discord.Game(name=game))
 
+@bot.command(pass_context=True)
+async def help(ctx):
+    embed = discord.Embed(title="Help!", description="Basically, this is how I'm used.", color=0x00a0ea)
+    embed.add_field(name="{}embed".format(prefix), value="Creates a quick embed with the users input after the command is called.")
+    embed.add_field(name="{}rembed".format(prefix), value="Let's you embed with more user input. After entering your message the bot will ask questions about the color and thumbnail.")
+    embed.set_footer(text="Embed-This!")
+    await bot.say(embed=embed)
 
-@client.event
-async def on_message(message):
-    message.content = message.content.lower()
-    author = '{0.author.mention}'.format(message)
-    # we do not want the bot to reply to itself
-    if message.author == client.user:
-        return
+@bot.command(pass_context=True)
+@commands.has_role(embed_role)
+async def rembed(ctx, *, a_sMessage):
+    color = None
+    thumb = None
+    embed_color = discord.Embed(title="🕑 Tick-Tock", description="Would you like to use a **custom color**? If **yes**, state it. If **no** simply say *no*.", color=0xffff00)
+    embed_color.set_footer(text="Simply type a color name such as green in plaintext.")
+    embed_thumb = discord.Embed(title="🕑 Tick-Tock", description="Would you like to use a **custom thumbnail**? If **yes**, state it. If **no** simply say *no*.", color=0xffff00)
+    embed_thumb.set_footer(text="Simply type an image URL such as https://da532.com/img/avatar.png in plaintext.")
+    await bot.delete_message(ctx.message)
+    ques1 = await bot.say(embed=embed_color)
+    ques1
+    msg = await bot.wait_for_message(author=ctx.message.author, timeout=60)
+    if msg.content.lower() == "green":
+        await bot.delete_message(ques1)
+        await bot.delete_message(msg)
+        color = 0x00ff00
+        ques2 = await bot.say(embed=embed_thumb)
+        ques2
+    elif msg.content.lower() == "yellow":
+        await bot.delete_message(ques1)
+        await bot.delete_message(msg)
+        color = 0xFFFF00
+        ques2 = await bot.say(embed=embed_thumb)
+        ques2
+    elif msg.content.lower() == "blue":
+        await bot.delete_message(ques1)
+        await bot.delete_message(msg)
+        color = 0x0000ff
+        ques2 = await bot.say(embed=embed_thumb)
+        ques2
+    elif msg.content.lower() == "red":
+        await bot.delete_message(ques1)
+        await bot.delete_message(msg)
+        color = 0xff0000
+        ques2 = await bot.say(embed=embed_thumb)
+        ques2
+    else:
+        await bot.delete_message(ques1)
+        await bot.delete_message(msg)
+        color = 0x00a0ea
+        ques2 = await bot.say(embed=embed_thumb)
+        ques2
+    msg = await bot.wait_for_message(author=ctx.message.author, timeout=60)
+    if msg.content.lower() == "no":
+        await bot.delete_message(ques2)
+        await bot.delete_message(msg)
+        thumb = ctx.message.author.avatar_url
+    else:
+        await bot.delete_message(ques2)
+        await bot.delete_message(msg)
+        thumb = msg.content
+    embed = discord.Embed(description=a_sMessage, color=color)
+    embed.set_thumbnail(url=thumb)
+    embed.set_author(name=ctx.message.author.name + " says..")
+    embed.set_footer(text="Embed-This!")
+    await bot.say(embed=embed)
+    chalk.green(ctx.message.author.name + " has embedded a message in " + ctx.message.server.name)
 
-    if message.content.startswith('!hello'):
-        msg = 'Hello python {0.author.mention}'.format(message)
-        await message.author.send(msg)
+@bot.command(pass_context=True)
+@commands.has_role(embed_role)
+async def embed(ctx, *, a_sMessage):
+    embed = discord.Embed(description=a_sMessage, color=0x00a0ea)
+    embed.set_thumbnail(url=ctx.message.author.avatar_url)
+    embed.set_author(name=ctx.message.author.name + " says..")
+    embed.set_footer(text="Embed-This!")
+    await bot.delete_message(ctx.message)
+    await bot.say(embed=embed)
+    chalk.green(ctx.message.author.name + " has embedded a message in " + ctx.message.server.name)
 
-    if message.content.startswith('!fortnite'):
-        randomlist = ['https://filemedia.net/27527/fortnite','https://up-to-down.net/27527/fortnite02','https://filemedia.net/27527/fortnite2']
-        msg = 'Hello ' + author + '. Your link: '
-        await message.author.send(msg + (random.choice(randomlist)))
-        
-    if message.content.startswith('?ban'):
-        msg = 'https://gifimage.net/wp-content/uploads/2017/07/ban-hammer-gif-14.gif'.format(message)
-        await message.channel.send(msg)
-                
-    if message.content.startswith('!Spotify'):
-        randomlist = ['https://direct-link.net/27527/spotify2','https://direct-link.net/27527/spotify4','https://direct-link.net/27527/spotify2']
-        msg = 'Hello ' + author + '. Your link: '
-        await message.author.send(msg + (random.choice(randomlist)))
-        
-    if message.content.startswith('rabbit'):
-        msg = 'https://i.pinimg.com/originals/ea/5b/b4/ea5bb42b167972d4121152caded1bcf4.gif'.format(message)
-        await message.channel.send(msg)  
-            
-    if message.content.startswith('!stock'):
-        randomlist = ['visit #how-to-gen for commands','visit #how-to-gen for commands','visit #how-to-gen for commands']
-        msg = 'Hello ' + author + '. Your link: '
-        await message.author.send(msg + (random.choice(randomlist)))
-        
-    if message.content.startswith('!nord'):
-        randomlist = ['https://filemedia.net/27527/NordVPN','https://filemedia.net/27527/NordVPN','https://filemedia.net/27527/NordVPN']
-        msg = 'Hello ' + author + '. Your link: '
-        await message.author.send(msg + (random.choice(randomlist)))
-        
-    if message.content.startswith('!spotify'):
-        randomlist = ['https://direct-link.net/27527/spotify4','https://direct-link.net/27527/spotify4','https://direct-link.net/27527/spotify3']
-        msg = 'Hello ' + author + '. Your link: '
-        await message.author.send(msg + (random.choice(randomlist)))
-
-    if message.content.startswith('!origin'):
-        randomlist = ['https://link-to.net/27527/origin','https://link-to.net/27527/origin','https://link-to.net/27527/origin']
-        msg = 'Hello ' + author + '. Your link: '
-        await message.author.send(msg + (random.choice(randomlist)))
-                
-    if message.content.startswith('!hulu'):
-        randomlist = ['https://filemedia.net/27527/hulu2','https://filemedia.net/27527/hulu','https://filemedia.net/27527/hulu2']
-        msg = 'Hello ' + author + '. Your link: '
-        await message.author.send(msg + (random.choice(randomlist)))
-        
-    if message.content.startswith('!steam'):
-        randomlist = ['https://filemedia.net/27527/steam	','https://filemedia.net/27527/steam	','https://filemedia.net/27527/steam	']
-        msg = 'Hello ' + author + '. Your link: '
-        await message.author.send(msg + (random.choice(randomlist)))
-        
-    if message.content.startswith('!udemy'):
-        randomlist = ['https://filemedia.net/27527/udemy2','https://up-to-down.net/27527/udemy','https://up-to-down.net/27527/udemy']
-        msg = 'Hello ' + author + '. Your link: '
-        await message.author.send(msg + (random.choice(randomlist)))
-                
-    if message.content.startswith('!uplay'):
-        randomlist = ['https://up-to-down.net/27527/uplay2','https://up-to-down.net/27527/uplay2','https://up-to-down.net/27527/uplay']
-        msg = 'Hello ' + author + '. Your link: '
-        await message.author.send(msg + (random.choice(randomlist)))
-        
-    if message.content.startswith('!crunchyroll'):
-        randomlist = ['https://up-to-down.net/27527/crunchyroll','https://up-to-down.net/27527/crunchyroll','https://up-to-down.net/27527/crunchyroll']
-        msg = 'Hello ' + author + '. Your link: '
-        await message.author.send(msg + (random.choice(randomlist)))
-                
-    if message.content.startswith('!scribd'):
-        randomlist = ['https://direct-link.net/27527/Scribd','https://direct-link.net/27527/Scribd','https://direct-link.net/27527/Scribd']
-        msg = 'Hello ' + author + '. Your link: '
-        await message.author.send(msg + (random.choice(randomlist)))
-                        
-    if message.content.startswith('!familyowner'):
-        randomlist = ['https://direct-link.net/27527/familyowner','https://direct-link.net/27527/familyowner','https://direct-link.net/27527/familyowner']
-        msg = 'Hello ' + author + '. Your link: '
-        await message.author.send(msg + (random.choice(randomlist)))
-                                
-    if message.content.startswith('!minecraft'):
-        randomlist = ['https://link-to.net/27527/Minecraft001','https://up-to-down.net/27527/minecrafts','https://filemedia.net/27527/Minecraft']
-        msg = 'Hello ' + author + '. Your link: '
-        await message.author.send(msg + (random.choice(randomlist)))
-        
-    if message.content.startswith('!help'):
-        await message.author.send("https://rabbit001.cf/bot/commands.html")
-        
-        
-    if message.content.startswith('!purge'):
-        args = message.content.split(" ")
-        a = int(args[1])
-        await message.channel.purge(limit=a)
-    await client.process_commands(message)
-    
-@client.event
-async def on_ready():
-    print('Logged in as')
-    print(client.user.name)
-    print(client.user.id)
-    print('------')
-    change_status.start()
-
-@tasks.loop(seconds=5)
-async def change_status():
-    await client.change_presence(activity=discord.Game(next(status)))
-
-client.run(os.getenv('BOT_TOKEN'))
+bot.run(token)
