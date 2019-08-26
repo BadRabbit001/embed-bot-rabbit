@@ -16,4 +16,4 @@ async def on_message(message):
         embed = discord.Embed(title="Tile", description="Desc", color=0x00ff00)
         await message.channel.send(message.channel, embed=embed)
         
-client.run('BOT_TOKEN')
+client.run(os.getenv('BOT_TOKEN'))
