@@ -14,8 +14,8 @@ Clientdiscord = discord.Client()
 async def on_message(message):
     if message.content.startswith('!help'):
         embed = discord.Embed(title="For more info visit http://rabbit001.cf", description="", color=0x00ff00)
-        embed.add_field(name="Fiel1", value="hi", inline=False)
-        embed.add_field(name="Field2", value="hi2", inline=False)
+        embed.add_field(name="commands:", value="for list of commands visit: http://rabbit001.cf/commands.html", inline=False)
+        embed.add_field(name="U want invite my bot to ur server? Use this link:", value="https://discordapp.com/oauth2/authorize?client_id=604967241863397376&permissions=8&scope=bot", inline=False)
         await message.channel.send(message.channel, embed=embed)
 
         
