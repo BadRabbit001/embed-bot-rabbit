@@ -4,6 +4,7 @@ import asyncio
 import time
 import random
 from discord import Game
+import os
 
 Client = discord.client
 client = commands.Bot(command_prefix = '!')
