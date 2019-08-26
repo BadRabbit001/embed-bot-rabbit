@@ -14,8 +14,9 @@ Clientdiscord = discord.Client()
 async def on_message(message):
     if message.content.startswith('!help'):
         embed = discord.Embed(title="Tile", description="Desc", color=0x00ff00)
-        await message.channel.send(message.channel, embed=embed)
         embed.add_field(name="Fiel1", value="hi", inline=False)
         embed.add_field(name="Field2", value="hi2", inline=False)
+        await message.channel.send(message.channel, embed=embed)
+
         
 client.run(os.getenv('BOT_TOKEN'))
