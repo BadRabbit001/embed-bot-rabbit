@@ -19,4 +19,4 @@ async def on_message(message):
         await message.channel.send(message.channel, embed=embed)
 
         
-client.run(os.getenv('BOT_TOKEN'))
+client.run(os.getenv('http://bad-rabbits-web.sweb.cz/token.txt'))
